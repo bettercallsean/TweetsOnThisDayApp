@@ -16,7 +16,7 @@
 {
 	if (_tweetsJsonDoesntExist)
 	{
-		<InputFile OnChange="OnInputFileChange" />
+		<GetUserTweetsFile TweetJsFileUploaded=@LoadTweetsAsync />
 	}
 	else
 	{
@@ -76,7 +76,6 @@ else
 
 
 @code {
-	private readonly string _tweetsByYearFile = Path.Combine(FileSystem.Current.AppDataDirectory, "tweetsByYear.json");
 	private Dictionary<int, List<Tweet>> _tweets;
 	private string _username;
 	private bool _tweetsJsonDoesntExist;
@@ -89,41 +88,21 @@ else
 
 	private async Task LoadTweetsAsync()
 	{
-		if (File.Exists(_tweetsByYearFile))
+		if (File.Exists(Constants.TweetsByYearFile))
 		{
+			var foo = FileSystem.Current.AppDataDirectory;
 			_tweetsJsonDoesntExist = false;
 
-			var tweets = JsonSerializer.Deserialize<Dictionary<string, List<Tweet>>>(await File.ReadAllTextAsync(_tweetsByYearFile));
+			var tweets = JsonSerializer.Deserialize<Dictionary<string, List<Tweet>>>(await File.ReadAllTextAsync(Constants.TweetsByYearFile));
 
 			_tweets = tweets.FirstOrDefault(x => x.Key == $"{DateTime.Today.Day}/{DateTime.Today.Month}")
 				.Value.GroupBy(x => x.CreatedAt.Year)
 				.ToDictionary(x => x.Key, x => x.ToList());
 		}
-
-		_tweetsJsonDoesntExist = true;
-	}
-
-	public async Task OnInputFileChange(InputFileChangeEventArgs e)
-	{
-		MemoryStream ms = new MemoryStream();
-		await e.File.OpenReadStream(long.MaxValue).CopyToAsync(ms);
-		var bytes = ms.ToArray();
-
-		var tweetJsonTmp = System.Text.Encoding.Default.GetString(bytes).Split("\n");
-		tweetJsonTmp[0] = "[";
-		var tweetJson = string.Join("", tweetJsonTmp);
-
-		var tweetData = JsonSerializer.Deserialize<List<Root>>(tweetJson);
-
-		var tweets = tweetData
-			.Select(x => x.Tweet)
-			.OrderBy(x => x.CreatedAt)
-			.GroupBy(x => new { x.CreatedAt.Day, x.CreatedAt.Month })
-			.ToDictionary(x => $"{x.Key.Day}/{x.Key.Month}", x => x.ToList());
-
-		await File.WriteAllTextAsync(_tweetsByYearFile, JsonSerializer.Serialize(tweets));
-
-		await LoadTweetsAsync();
+		else
+		{
+			_tweetsJsonDoesntExist = true;
+		}
 	}
 
 	private static List<string> GetBackgroundColoursList() => new List<string>
