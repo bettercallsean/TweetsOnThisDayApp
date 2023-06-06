@@ -1,0 +1,81 @@
+html body {
+    font-family: "Roboto", "Arial", serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+
+p {
+    margin: 10px;
+}
+
+div {
+    user-select: none;
+}
+
+.tweet-year {
+    font-size: 30px;
+    text-align: center;
+    padding-top: 10px;
+    position: sticky;
+    top: 0px;
+    padding-bottom: 5px;
+}
+
+.tweet-count {
+    font-size: 14px;
+    text-align: center;
+    padding-bottom: 10px;
+    margin: 0px;
+    z-index: -1;
+    top: -10px;
+    position: relative;
+}
+
+.tweet-time {
+    text-align: center;
+    font-size: 14px;
+}
+
+.tweet-text {
+    text-align: center;
+    font-size: 18px;
+    padding-bottom: 10px;
+}
+
+.tweet-link {
+    font-size: 14px;
+    user-select: none;
+    text-align: right;
+    text-decoration: none;
+}
+
+.tweet {
+    border: 1px solid black;
+    box-sizing: border-box;
+    margin: 10px;
+    padding: 10px;
+}
+
+img {
+    max-height: 80%;
+    max-width: 80%;
+    margin: 10px;
+}
+
+.image-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+video {
+    margin: 10px;
+}

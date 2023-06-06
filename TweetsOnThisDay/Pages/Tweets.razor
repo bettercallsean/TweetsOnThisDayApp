@@ -1,0 +1,140 @@
+﻿@page "/"
+
+@using Microsoft.Extensions.Configuration
+@using System.Text.RegularExpressions;
+@using System.Text.Json;
+@using System.Web;
+@using TweetsOnThisDay.Models;
+@inject IConfiguration Configuration
+
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+	<link href="css/tweets.css" type="text/css" rel="stylesheet" />
+</head>
+
+@if (_tweets == null)
+{
+	if (_tweetsJsonDoesntExist)
+	{
+		<InputFile OnChange="OnInputFileChange" />
+	}
+	else
+	{
+		<p><em>Loading...</em></p>
+	}
+}
+else
+{
+	var backgroundColours = GetBackgroundColoursList();
+
+	foreach (var (year, tweets) in _tweets)
+	{
+		var tweetCount = tweets.Count;
+		var backgroundColourIndex = Random.Shared.Next(backgroundColours.Count);
+		<div class="tweet-year" style="background-color: @backgroundColours[backgroundColourIndex]">
+			<p>~ @year.ToString() ~</p>
+		</div>
+		<div class="tweet-count" style="background-color: @backgroundColours[backgroundColourIndex]">
+			<p>@tweetCount.ToString() tweet@(tweetCount > 1 ? "s" : string.Empty)</p>
+		</div>
+
+		if (backgroundColours.Count > 0)
+			backgroundColours.RemoveAt(backgroundColourIndex);
+		else
+			backgroundColours = GetBackgroundColoursList();
+
+		foreach (var tweet in tweets)
+		{
+			<div class="tweet">
+				<p class="tweet-time">@tweet.CreatedAt.ToString("t")</p>
+				<p class="tweet-text">@HttpUtility.HtmlDecode(tweet.FullText)</p>
+				@if (tweet.ExtendedEntities != null)
+				{
+					<div class="image-container">
+						@foreach (var media in tweet.ExtendedEntities.Media)
+						{
+							if (media.VideoInfo == null)
+							{
+								<img src="@media.MediaUrlHttps" />
+							}
+							else
+							{
+								var videoInfo = media.VideoInfo.Variants.First();
+								<video controls autoplay muted>
+									<source src="@videoInfo.Url" type="@videoInfo.ContentType" />
+									Your browser does not support the video tag.
+								</video>
+							}
+						}
+					</div>
+				}
+				<a class="tweet-link" href="@($"https://twitter.com/{_username}/status/{tweet.Id}")">View Tweet</a>
+			</div>
+		}
+	}
+}
+
+
+@code {
+	private readonly string _tweetsByYearFile = Path.Combine(FileSystem.Current.AppDataDirectory, "tweetsByYear.json");
+	private Dictionary<int, List<Tweet>> _tweets;
+	private string _username;
+	private bool _tweetsJsonDoesntExist;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_username = Configuration["TwitterUsername"];
+		await LoadTweetsAsync();
+	}
+
+	private async Task LoadTweetsAsync()
+	{
+		if (File.Exists(_tweetsByYearFile))
+		{
+			_tweetsJsonDoesntExist = false;
+
+			var tweets = JsonSerializer.Deserialize<Dictionary<string, List<Tweet>>>(await File.ReadAllTextAsync(_tweetsByYearFile));
+
+			_tweets = tweets.FirstOrDefault(x => x.Key == $"{DateTime.Today.Day}/{DateTime.Today.Month}")
+				.Value.GroupBy(x => x.CreatedAt.Year)
+				.ToDictionary(x => x.Key, x => x.ToList());
+		}
+
+		_tweetsJsonDoesntExist = true;
+	}
+
+	public async Task OnInputFileChange(InputFileChangeEventArgs e)
+	{
+		MemoryStream ms = new MemoryStream();
+		await e.File.OpenReadStream(long.MaxValue).CopyToAsync(ms);
+		var bytes = ms.ToArray();
+
+		var tweetJsonTmp = System.Text.Encoding.Default.GetString(bytes).Split("\n");
+		tweetJsonTmp[0] = "[";
+		var tweetJson = string.Join("", tweetJsonTmp);
+
+		var tweetData = JsonSerializer.Deserialize<List<Root>>(tweetJson);
+
+		var tweets = tweetData
+			.Select(x => x.Tweet)
+			.OrderBy(x => x.CreatedAt)
+			.GroupBy(x => new { x.CreatedAt.Day, x.CreatedAt.Month })
+			.ToDictionary(x => $"{x.Key.Day}/{x.Key.Month}", x => x.ToList());
+
+		await File.WriteAllTextAsync(_tweetsByYearFile, JsonSerializer.Serialize(tweets));
+
+		await LoadTweetsAsync();
+	}
+
+	private static List<string> GetBackgroundColoursList() => new List<string>
+			{
+				"skyblue",
+				"lightcoral",
+				"mediumspringgreen",
+				"peachpuff",
+				"palegreen",
+				"lightcyan",
+				"thistle",
+				"powderblue"
+			};
+}
