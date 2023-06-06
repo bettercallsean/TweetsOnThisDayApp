@@ -1,19 +1,18 @@
-﻿@page "/test"
-@using System.Text.Json;
+﻿@using System.Text.Json;
 @using TweetsOnThisDay.Models;
 
 @if(_fileUploaded)
 {
-	<p><em>Loading...</em></p>
+	<Loading IsLoading=@_isLoading LoadingText="Processing tweet data" />
 }
 else
 {
 	<p>Get started by uploading your 'tweet.js' file here</p>
-	<InputFile OnChange=@OnInputFileChanged accept=".js" />
+	<InputFile OnChange=@OnInputFileChanged />
 }
 
-
 @code {
+	private bool _isLoading;
 	private bool _fileUploaded;
 
 	[Parameter] 
@@ -22,6 +21,7 @@ else
 	public async Task OnInputFileChanged(InputFileChangeEventArgs e)
 	{
 		_fileUploaded = true;
+		_isLoading = true;
 
 		var ms = new MemoryStream();
 		await e.File.OpenReadStream(long.MaxValue).CopyToAsync(ms);
@@ -31,16 +31,25 @@ else
 		tweetJsonTmp[0] = "[";
 		var tweetJson = string.Join("", tweetJsonTmp);
 
-		var tweetData = JsonSerializer.Deserialize<List<Root>>(tweetJson);
+		try
+		{
+			var tweetData = JsonSerializer.Deserialize<List<Root>>(tweetJson);
 
-		var tweets = tweetData
-			.Select(x => x.Tweet)
-			.OrderBy(x => x.CreatedAt)
-			.GroupBy(x => new { x.CreatedAt.Day, x.CreatedAt.Month })
-			.ToDictionary(x => $"{x.Key.Day}/{x.Key.Month}", x => x.ToList());
+			var tweets = tweetData
+				.Select(x => x.Tweet)
+				.OrderBy(x => x.CreatedAt)
+				.GroupBy(x => new { x.CreatedAt.Day, x.CreatedAt.Month })
+				.ToDictionary(x => $"{x.Key.Day}/{x.Key.Month}", x => x.ToList());
 
-		await File.WriteAllTextAsync(Constants.TweetsByYearFile, JsonSerializer.Serialize(tweets));
+			await File.WriteAllTextAsync(Constants.TweetsByYearFile, JsonSerializer.Serialize(tweets));
 
-		await TweetJsFileUploaded.InvokeAsync();
+			await TweetJsFileUploaded.InvokeAsync();
+		}
+		catch
+		{
+			_fileUploaded = false;
+		}
+
+		_isLoading = false;
 	}
 }

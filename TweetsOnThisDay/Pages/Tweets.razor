@@ -12,7 +12,7 @@
 	<link href="css/tweets.css" type="text/css" rel="stylesheet" />
 </head>
 
-@if (_tweets == null)
+@if (!_tweetsLoaded)
 {
 	if (_tweetsJsonDoesntExist)
 	{
@@ -20,7 +20,7 @@
 	}
 	else
 	{
-		<p><em>Loading...</em></p>
+		<Loading IsLoading=@(!_tweetsLoaded) LoadingText="Loading tweet data" />
 	}
 }
 else
@@ -76,6 +76,7 @@ else
 
 
 @code {
+	private bool _tweetsLoaded => _tweets != null;
 	private Dictionary<int, List<Tweet>> _tweets;
 	private string _username;
 	private bool _tweetsJsonDoesntExist;

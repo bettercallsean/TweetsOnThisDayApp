@@ -1,0 +1,24 @@
+﻿@page "/settings"
+
+<h3>Settings</h3>
+
+<div>
+	<button disabled=@_isDeleteTweetButtonDisabled onclick=@DeleteTweetData type="button" class="btn btn-danger">
+		Delete Tweet Data
+	</button>
+	<p>Size on disk: @_tweetDataFileSize MB</p>
+</div>
+
+
+@code {
+	private bool _tweetFileExists => File.Exists(Constants.TweetsByYearFile);
+	private bool _isDeleteTweetButtonDisabled => !_tweetFileExists;
+	private double _tweetDataFileSize => _tweetFileExists
+		? Math.Round(new System.IO.FileInfo(Constants.TweetsByYearFile).Length / Math.Pow(2, 20), 2)
+		: 0;
+
+	private void DeleteTweetData()
+	{
+		File.Delete(Constants.TweetsByYearFile);
+	}
+}
