@@ -1,5 +1,4 @@
-﻿<div class="container-fluid">
-@if (IsLoading)
+﻿@if (IsLoading)
 {
     if (LoadingTemplate != null)
     {
@@ -8,9 +7,9 @@
     else
     {
         <div class="container-fluid">
-            <div class="spinner-border text-primary" role="status"></div>
+            <SpinKitThreeBounce />
 
-            <span>@LoadingText</span>
+            <h3 class="text-center">@LoadingText</h3>
         </div>
     }
 }
@@ -18,7 +17,6 @@ else
 {
     @ChildContent
 }
-</div>
 
 @code {
     [Parameter]
