@@ -1,15 +1,22 @@
 ﻿@using System.Text.Json;
 @using TweetsOnThisDay.Models;
 
-@if(_fileUploaded)
-{
-	<Loading IsLoading=@_isLoading LoadingText="Processing tweet data" />
-}
-else
-{
-	<p>Get started by uploading your 'tweet.js' file here</p>
-	<InputFile OnChange=@OnInputFileChanged />
-}
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+	<link href="css/settings.css" type="text/css" rel="stylesheet" />
+</head>
+
+
+	@if (_fileUploaded)
+	{
+		<Loading IsLoading=@_isLoading LoadingText="Processing tweet data" />
+	}
+	else
+	{
+		<p>Get started by uploading your 'tweet.js' file here</p>
+		<InputFile OnChange=@OnInputFileChanged />
+	}
+
 
 @code {
 	private bool _isLoading;

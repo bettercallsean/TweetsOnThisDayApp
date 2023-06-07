@@ -1,9 +1,13 @@
 ﻿@page "/settings"
 
-<h3>Settings</h3>
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+	<link href="css/settings.css" type="text/css" rel="stylesheet" />
+</head>
 
-<div>
-	<button disabled=@_isDeleteTweetButtonDisabled onclick=@DeleteTweetData type="button" class="btn btn-danger">
+<div class="settings">
+	<h3>Settings</h3>
+	<button disabled=@_isDeleteTweetButtonDisabled onclick=@DeleteTweetDataAsync type="button" class="btn btn-danger">
 		Delete Tweet Data
 	</button>
 	<p>Size on disk: @_tweetDataFileSize MB</p>
@@ -17,8 +21,11 @@
 		? Math.Round(new System.IO.FileInfo(Constants.TweetsByYearFile).Length / Math.Pow(2, 20), 2)
 		: 0;
 
-	private void DeleteTweetData()
+	private async Task DeleteTweetDataAsync()
 	{
-		File.Delete(Constants.TweetsByYearFile);
+		var response = await Application.Current.MainPage.DisplayAlert("Delete?", "Are you sure want to delete your tweet data?", "Yes", "No");
+
+		if(response)
+			File.Delete(Constants.TweetsByYearFile);
 	}
 }

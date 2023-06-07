@@ -14,7 +14,8 @@
 
 @if (!_tweetsLoaded)
 {
-	if (_tweetsJsonDoesntExist)
+	<div class="settings">
+	@if (_tweetsJsonDoesntExist)
 	{
 		<GetUserTweetsFile TweetJsFileUploaded=@LoadTweetsAsync />
 	}
@@ -22,6 +23,7 @@
 	{
 		<Loading IsLoading=@(!_tweetsLoaded) LoadingText="Loading tweet data" />
 	}
+	</div>
 }
 else
 {
@@ -32,10 +34,10 @@ else
 		var tweetCount = tweets.Count;
 		var backgroundColourIndex = Random.Shared.Next(backgroundColours.Count);
 		<div class="tweet-year" style="background-color: @backgroundColours[backgroundColourIndex]">
-			<p>~ @year.ToString() ~</p>
+			<h2>~ @year.ToString() ~</h2>
 		</div>
 		<div class="tweet-count" style="background-color: @backgroundColours[backgroundColourIndex]">
-			<p>@tweetCount.ToString() tweet@(tweetCount > 1 ? "s" : string.Empty)</p>
+			<p class="text-body-secondary">@tweetCount.ToString() tweet@(tweetCount > 1 ? "s" : string.Empty)</p>
 		</div>
 
 		if (backgroundColours.Count > 0)
@@ -45,7 +47,7 @@ else
 
 		foreach (var tweet in tweets)
 		{
-			<div class="tweet">
+			<div class="tweet shadow-sm">
 				<p class="tweet-time">@tweet.CreatedAt.ToString("t")</p>
 				<p class="tweet-text">@HttpUtility.HtmlDecode(tweet.FullText)</p>
 				@if (tweet.ExtendedEntities != null)
@@ -55,7 +57,7 @@ else
 						{
 							if (media.VideoInfo == null)
 							{
-								<img src="@media.MediaUrlHttps" />
+								<img class="rounded mx-auto d-block" src="@media.MediaUrlHttps" />
 							}
 							else
 							{
