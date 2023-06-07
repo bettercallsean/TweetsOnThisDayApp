@@ -7,7 +7,7 @@
              BackgroundColor="{DynamicResource PageBackgroundColor}">
 
     <ContentPage.Behaviors>
-        <toolkit:StatusBarBehavior StatusBarColor="Transparent"
+        <toolkit:StatusBarBehavior StatusBarColor="Black"
                                    StatusBarStyle="LightContent" />
     </ContentPage.Behaviors>
 
