@@ -1,0 +1,82 @@
+﻿@page "/"
+
+@using Microsoft.Extensions.Configuration
+@using System.Text.RegularExpressions;
+@using System.Text.Json;
+@using System.Web;
+@using TweetsOnThisDay.Models;
+
+@if (!_tweetsLoaded)
+{
+
+	@if (!_tweetsJsonExists)
+	{
+		<GetUserTweetsFile TweetJsFileUploaded=@LoadTweetsAsync />
+	}
+	else
+	{
+		<Loading IsLoading=@(!_tweetsLoaded) LoadingText="Loading tweets" />
+	}
+}
+else
+{
+	var backgroundColours = GetBackgroundColoursList();
+
+	foreach (var (year, tweets) in _tweets)
+	{
+		var tweetCount = tweets.Count;
+		var backgroundColourIndex = Random.Shared.Next(backgroundColours.Count);
+		
+		<div class="tweet-year">
+			<TweetYear Tweets=@tweets Year=@year BackgroundColour=@backgroundColours[backgroundColourIndex] />
+		</div>
+		
+
+		if (backgroundColours.Count > 0)
+			backgroundColours.RemoveAt(backgroundColourIndex);
+		else
+			backgroundColours = GetBackgroundColoursList();
+	}
+}
+
+@code {
+	private bool _tweetsLoaded => _tweets != null;
+	private Dictionary<int, List<TweetModel>> _tweets;
+	private bool _tweetsJsonExists;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadTweetsAsync();
+	}
+
+	private async Task LoadTweetsAsync()
+	{
+		if (File.Exists(Constants.TweetsByYearFile))
+		{
+			var foo = FileSystem.Current.AppDataDirectory;
+			_tweetsJsonExists = true;
+
+			var tweets = JsonSerializer.Deserialize<Dictionary<string, List<TweetModel>>>(await File.ReadAllTextAsync(Constants.TweetsByYearFile));
+
+			_tweets = tweets.FirstOrDefault(x => x.Key == $"{DateTime.Today.Day}/{DateTime.Today.Month}")
+				.Value.GroupBy(x => x.CreatedAt.Year)
+				.ToDictionary(x => x.Key, x => x.ToList());
+		}
+		else
+		{
+			_tweetsJsonExists = false;
+		}
+	}
+
+	private static List<string> GetBackgroundColoursList() => new List<string>
+			{
+				"skyblue",
+				"lightcoral",
+				"mediumspringgreen",
+				"peachpuff",
+				"palegreen",
+				"lightcyan",
+				"thistle",
+				"powderblue"
+			};
+}

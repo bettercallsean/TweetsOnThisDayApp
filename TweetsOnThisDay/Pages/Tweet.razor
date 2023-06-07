@@ -1,0 +1,42 @@
+﻿@using System.Web;
+@using Microsoft.Extensions.Configuration;
+@using TweetsOnThisDay.Models;
+@inject IConfiguration Configuration;
+
+<div class="tweet shadow">
+	<p class="tweet-time">@TweetContent.CreatedAt.ToString("t")</p>
+	<p class="tweet-text">@HttpUtility.HtmlDecode(TweetContent.FullText)</p>
+	@if (TweetContent.ExtendedEntities != null)
+	{
+		<div class="image-container">
+			@foreach (var media in TweetContent.ExtendedEntities.Media)
+			{
+				if (media.VideoInfo == null)
+				{
+					<img class="rounded mx-auto d-block" src="@media.MediaUrlHttps" />
+				}
+				else
+				{
+					var videoInfo = media.VideoInfo.Variants.First();
+					<video controls autoplay muted>
+						<source src="@videoInfo.Url" type="@videoInfo.ContentType" />
+						Your browser does not support the video tag.
+					</video>
+				}
+			}
+		</div>
+	}
+	<a class="tweet-link" href="@($"https://twitter.com/{_username}/status/{TweetContent.Id}")">View Tweet</a>
+</div>
+
+@code {
+	private string _username;
+
+	[Parameter]
+	public TweetModel TweetContent { get; set; }
+
+	protected override void OnInitialized()
+	{
+		_username = Configuration["TwitterUsername"];
+	}
+}

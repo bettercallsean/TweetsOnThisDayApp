@@ -1,0 +1,39 @@
+.tweet-year {
+    font-size: 30px;
+    text-align: center;
+    padding: 10px 0 10px 0;
+    position: sticky;
+    top: 0px;
+}
+
+.tweet-count {
+    font-size: 14px;
+    text-align: center;
+    padding-bottom: 2px;
+    margin: 5px 0 0 0;
+    z-index: -1;
+    top: -10px;
+    position: relative;
+}
+
+html body {
+    font-family: "Roboto", "Arial", serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+
+p {
+    margin: 10px;
+}
+
+div {
+    user-select: none;
+}
