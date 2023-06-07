@@ -1,6 +1,6 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">TweetsOnThisDay</a>
+        <a class="navbar-brand" href="">@_selectedPage</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -10,12 +10,12 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All" @onclick="(() => SetHeaderTitle(_tweetsOnThisDay))">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
-        </div>
+        </div>S
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="settings">
+            <NavLink class="nav-link" href="settings" @onclick="(() => SetHeaderTitle(_settings))">
                 <span class="oi oi-cog" aria-hidden="true"></span> Settings
             </NavLink>
         </div>
@@ -23,12 +23,25 @@
 </div>
 
 @code {
+    private const string _settings = "Settings";
+    private const string _tweetsOnThisDay = "Tweets On This Day";
+    private string _selectedPage;
     private bool collapseNavMenu = true;
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
+    protected override void OnInitialized()
+    {
+        _selectedPage = _tweetsOnThisDay;
+    }
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private void SetHeaderTitle(string pageName)
+    {
+        _selectedPage = pageName;
     }
 }
