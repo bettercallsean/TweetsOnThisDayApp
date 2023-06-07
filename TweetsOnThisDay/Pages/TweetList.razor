@@ -56,11 +56,14 @@ else
 			var foo = FileSystem.Current.AppDataDirectory;
 			_tweetsJsonExists = true;
 
-			var tweets = JsonSerializer.Deserialize<Dictionary<string, List<TweetModel>>>(await File.ReadAllTextAsync(Constants.TweetsByYearFile));
+			await Task.Run(async () =>
+			{
+				var tweets = JsonSerializer.Deserialize<Dictionary<string, List<TweetModel>>>(await File.ReadAllTextAsync(Constants.TweetsByYearFile));
 
-			_tweets = tweets.FirstOrDefault(x => x.Key == $"{DateTime.Today.Day}/{DateTime.Today.Month}")
+				_tweets = tweets.FirstOrDefault(x => x.Key == $"{DateTime.Today.Day}/{DateTime.Today.Month}")
 				.Value.GroupBy(x => x.CreatedAt.Year)
 				.ToDictionary(x => x.Key, x => x.ToList());
+			});
 		}
 		else
 		{
