@@ -1,17 +1,13 @@
 ﻿@page "/settings"
 
-<head>
-	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
-	<link href="css/settings.css" type="text/css" rel="stylesheet" />
-</head>
-
-<div class="settings">
+<div class="p-2">
 	<button disabled=@_isDeleteTweetButtonDisabled onclick=@DeleteTweetDataAsync type="button" class="btn btn-danger">
 		Delete Tweet Data
 	</button>
 	<p>Size on disk: @_tweetDataFileSize MB</p>
-</div>
 
+	<p class="text-center font-italic">Sean Edwards 2023</p>
+</div>
 
 @code {
 	private bool _tweetFileExists => File.Exists(Constants.TweetsByYearFile);
@@ -22,9 +18,9 @@
 
 	private async Task DeleteTweetDataAsync()
 	{
-		var response = await Application.Current.MainPage.DisplayAlert("Delete?", "Are you sure want to delete your tweet data?", "Yes", "No");
+		var deleteData = await Application.Current.MainPage.DisplayAlert("Delete?", "Are you sure want to delete your tweet data?", "Yes", "No");
 
-		if(response)
+		if(deleteData)
 			File.Delete(Constants.TweetsByYearFile);
 	}
 }
