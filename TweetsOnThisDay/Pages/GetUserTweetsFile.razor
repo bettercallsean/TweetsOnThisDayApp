@@ -9,11 +9,9 @@ else
 {
 	<div class="container p-2">
 		<p class="text-center">Get started by uploading your 'tweet.js' file here</p>
-		<div class="d-flex justify-content-end">
-			<InputFile OnChange=@OnInputFileChanged />
-		</div>
-		<div class="d-flex justify-content-center m-2">
-			<button disabled=@(!_fileUploaded) class="btn btn-primary" onclick=@ProcessUserTweetDataAsync>Upload</button>
+		<div class="d-flex flex-column align-items-center justify-content-center">
+			<InputFile class="ms-8" OnChange=@OnInputFileChanged />
+			<button disabled=@(!_fileUploaded) class="btn btn-primary m-2" onclick=@ProcessUserTweetDataAsync>Upload</button>
 		</div>
 	</div>	
 }
@@ -51,14 +49,13 @@ else
 				var tweetData = JsonSerializer.Deserialize<List<Root>>(tweetJson);
 
 				var tweets = tweetData
-				.Select(x => x.Tweet)
-				.OrderBy(x => x.CreatedAt)
-				.GroupBy(x => new { x.CreatedAt.Day, x.CreatedAt.Month })
-				.ToDictionary(x => $"{x.Key.Day}/{x.Key.Month}", x => x.ToList());
+								.Select(x => x.Tweet)
+								.OrderBy(x => x.CreatedAt)
+								.GroupBy(x => new { x.CreatedAt.Day, x.CreatedAt.Month })
+								.ToDictionary(x => $"{x.Key.Day}/{x.Key.Month}", x => x.ToList());
 
 				await File.WriteAllTextAsync(Constants.TweetsByYearFile, JsonSerializer.Serialize(tweets));
 			});
-
 
 			await TweetJsFileUploaded.InvokeAsync();
 		}
