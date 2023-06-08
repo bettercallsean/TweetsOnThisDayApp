@@ -10,7 +10,7 @@ html body {
 .tweet-text {
     text-align: center;
     font-size: 18px;
-    padding-bottom: 10px;
+
 }
 
 .tweet-link {
@@ -32,7 +32,6 @@ html body {
 img {
     max-height: 80%;
     max-width: 80%;
-    margin: 10px;
 }
 
 .image-container {
