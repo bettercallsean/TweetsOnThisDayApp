@@ -21,7 +21,7 @@ html body {
 }
 
 .tweet {
-    border: 2px solid lightslategrey;
+    border: 2px solid #455a64;
     border-radius: 5px;
     box-sizing: border-box;
     margin: 15px;
