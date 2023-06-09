@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Maui;
+﻿using System.Reflection;
+using CommunityToolkit.Maui;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RestSharp;
 using TweetsOnThisDay.Interfaces;
@@ -21,7 +23,17 @@ public static class MauiProgram
 
 		builder.Services.AddMauiBlazorWebView();
 
-		builder.Services.AddSingleton<IRestClient>(new RestClient(new HttpClient()))
+		var assembly = Assembly.GetExecutingAssembly();
+		using var stream = assembly.GetManifestResourceStream("TweetsOnThisDay.appsettings.json");
+
+		var config = new ConfigurationBuilder()
+					.AddJsonStream(stream)
+					.Build();
+
+		builder.Configuration.AddConfiguration(config);
+
+		builder.Services
+			.AddSingleton<IRestClient>(new RestClient(new HttpClient()))
 			.AddSingleton<IHtmlToImageService, HtmlToImageService>();
 
 #if DEBUG

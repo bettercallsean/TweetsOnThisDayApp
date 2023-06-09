@@ -1,4 +1,5 @@
-﻿using RestSharp;
+﻿using Microsoft.Extensions.Configuration;
+using RestSharp;
 using RestSharp.Authenticators;
 using TweetsOnThisDay.Interfaces;
 using TweetsOnThisDay.Models;
@@ -9,20 +10,15 @@ internal class HtmlToImageService : IHtmlToImageService
 	private const string BaseUri = "https://hcti.io/v1/image";
 
 	private readonly IRestClient _client;
+	private readonly string _userId;
+	private readonly string _apiKey;
 
-	private string _userId;
-	private string _apiKey;
-
-	public HtmlToImageService(IRestClient client)
+	public HtmlToImageService(IRestClient client, IConfiguration configuration)
 	{
 		_client = client;
 
-		Task.Run(async () =>
-		{
-			_userId = await SecureStorage.Default.GetAsync("htmlToImageApiUserId");
-			_apiKey = await SecureStorage.Default.GetAsync("htmlToImageApiKey");
-		});
-
+		_userId = configuration.GetValue<string>("HctiUserId");
+		_apiKey = configuration.GetValue<string>("HctiApiKey");
 	}
 
 	public async Task<byte[]> GetImageFromHtmlAsync(string html)
