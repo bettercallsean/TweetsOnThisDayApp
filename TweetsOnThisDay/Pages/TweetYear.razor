@@ -1,12 +1,11 @@
 ﻿@using TweetsOnThisDay.Models;
 
 <div class="tweet-year text-white" style="background-color: @BackgroundColour">
-		<h2 class="text-center">@Year.ToString()</h2>
+		<h2 class="text-center text-shadow">@Year.ToString()</h2>
 	</div>
 <div class="tweet-count text-white" style="background-color: @BackgroundColour">
-		<p class="text-body-secondary">@Tweets.Count.ToString() tweet@(Tweets.Count > 1 ? "s" : string.Empty)</p>
+		<p class="text-body-secondary text-uppercase text-shadow">@Tweets.Count.ToString() tweet@(Tweets.Count > 1 ? "s" : string.Empty)</p>
 	</div>
-
 
 @foreach (var tweet in Tweets)
 {
