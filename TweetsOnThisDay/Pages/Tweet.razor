@@ -8,6 +8,15 @@
 @using TweetsOnThisDay.Models;
 @inject IHtmlToImageService HtmlToImageService;
 
+@if (GeneratingSharedImage)
+{
+	<div class="position-relative">
+		<div class="z-1 position-absolute top-0 start-50 translate-middle-x border border-1 border-dark" style="background-color: white">
+			<Loading IsLoading=@GeneratingSharedImage LoadingText="Generating tweet image" />
+		</div>
+	</div>
+	
+}
 <div class="tweet shadow">
 	<p class="tweet-time">@TweetContent.CreatedAt.ToString("t")</p>
 	<p class="tweet-text">@HttpUtility.HtmlDecode(TweetContent.FullText)</p>
@@ -54,8 +63,12 @@
 	[Parameter]
 	public TweetModel TweetContent { get; set; }
 
+	public bool GeneratingSharedImage { get; set; }
+
 	private async Task GenerateImageAsync()
 	{
+		GeneratingSharedImage = true;
+
 		var html = new ComponentRenderer<ShareTweet>()
 			.Set(c => c.TweetContent, TweetContent)
 			.Render();
@@ -64,6 +77,8 @@
 
 		var imageBytes = await HtmlToImageService.GetImageFromHtmlAsync(html);
 		await File.WriteAllBytesAsync(file, imageBytes);
+
+		GeneratingSharedImage = false;
 
 		await Share.Default.RequestAsync(new ShareFileRequest
 		{
