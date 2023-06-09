@@ -20,6 +20,12 @@
 }
 else
 {
+	if(_tweets.Count == 0)
+	{
+		<h2 class="text-center p-4">No tweets today :(</h2>
+	}
+	else
+	{
 	var backgroundColours = GetBackgroundColoursList();
 
 	foreach (var (year, tweets) in _tweets)
@@ -35,9 +41,10 @@ else
 		if (backgroundColours.Count > 0)
 			backgroundColours.RemoveAt(backgroundColourIndex);
 		
-		if(backgroundColours.Count == 0)
+			if (backgroundColours.Count == 0)
 			backgroundColours = GetBackgroundColoursList();
 	}
+}
 }
 
 @code {
