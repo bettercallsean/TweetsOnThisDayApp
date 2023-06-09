@@ -1,0 +1,125 @@
+@using System.Web;
+@using System.Text;
+@using TweetsOnThisDay.Models;
+
+<head>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+	<style>
+		html body {
+			font-family: "Roboto", "Arial", serif;
+			width: 512px;
+			height: 512px;
+		}
+
+		.tweet-time {
+			text-align: center;
+			font-size: 14px;
+		}
+
+		.tweet-text {
+			text-align: center;
+			font-size: xx-large;
+		}
+
+		.tweet {
+			border: 2px solid #455a64;
+			border-radius: 5px;
+			box-sizing: border-box;
+			padding: 10px;
+			margin: 15px 15px 20px;
+			height: inherit;
+		}
+
+		img {
+			max-height: 80%;
+			max-width: 80%;
+		}
+
+		.image-container {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+
+		video {
+			margin: 10px;
+		}
+
+		p {
+			margin: 10px;
+		}
+
+		.tweet-year {
+			font-family: 'Roboto';
+			padding: 10px 0 10px 0;
+			position: sticky;
+			top: 0px;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			border: 0;
+			outline: 0;
+			vertical-align: baseline;
+			background: transparent;
+		}
+	</style>
+</head>
+
+
+@{
+	var backgroundColours = GetBackgroundColoursList();
+	var backgroundColour = backgroundColours[Random.Shared.Next(backgroundColours.Count)];
+	
+	<div class="d-flex flex-column">
+		<div class="tweet-year" style="background-color: @backgroundColour">
+        		<h2 class="text-center">@TweetAge year@(TweetAge > 1 ? "s" : string.Empty) ago</h2>
+        	</div>
+        <div class="tweet shadow align-self-stretch">
+        	<p class="tweet-time">@TweetContent.CreatedAt.ToString("t")</p>
+        	<p class="tweet-text">@HttpUtility.HtmlDecode(TweetContent.FullText)</p>
+        	@if (TweetContent.ExtendedEntities != null)
+        	{
+        		<div class="image-container">
+        			@foreach (var media in TweetContent.ExtendedEntities.Media)
+        			{
+        				if (media.VideoInfo == null)
+        				{
+        					<img class="rounded mx-auto d-block pb-3" src="@media.MediaUrlHttps" />
+        				}
+        				else
+        				{
+        					var videoInfo = media.VideoInfo.Variants.First();
+        					<video controls autoplay muted>
+        						<source src="@videoInfo.Url" type="@videoInfo.ContentType" />
+        						Your browser does not support the video tag.
+        					</video>
+        				}
+        			}
+        		</div>
+        	}
+        </div>
+	</div>
+	
+}
+
+
+@code {
+	[Parameter]
+	public TweetModel TweetContent { get; set; }
+
+	public int TweetAge => DateTime.Today.Year - TweetContent.CreatedAt.Year;
+
+	private static List<string> GetBackgroundColoursList() => new List<string>
+			{
+				"skyblue",
+				"lightcoral",
+				"mediumspringgreen",
+				"peachpuff",
+				"palegreen",
+				"thistle",
+				"powderblue"
+			};
+}
