@@ -1,7 +1,7 @@
 ﻿@using TweetsOnThisDay.Models;
 
 <div class="tweet-year" style="background-color: @BackgroundColour">
-	<h2>~ @Year.ToString() ~</h2>
+	<h2 class="text-center">@Year.ToString()</h2>
 </div>
 <div class="tweet-count" style="background-color: @BackgroundColour">
 	<p class="text-body-secondary">@Tweets.Count.ToString() tweet@(Tweets.Count > 1 ? "s" : string.Empty)</p>

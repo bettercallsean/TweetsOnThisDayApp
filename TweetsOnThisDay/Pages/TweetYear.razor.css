@@ -1,12 +1,12 @@
 .tweet-year {
-    font-size: 30px;
-    text-align: center;
+    font-family: 'Roboto';
     padding: 10px 0 10px 0;
     position: sticky;
     top: 0px;
 }
 
 .tweet-count {
+    font-family: 'Roboto';
     font-size: 14px;
     text-align: center;
     padding-bottom: 2px;
@@ -16,16 +16,11 @@
     position: relative;
 }
 
-html body {
-    font-family: "Roboto", "Arial", serif;
-}
-
 * {
     margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
-    font-size: 100%;
     vertical-align: baseline;
     background: transparent;
 }
