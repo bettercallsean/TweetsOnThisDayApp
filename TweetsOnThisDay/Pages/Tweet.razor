@@ -1,7 +1,5 @@
 ﻿@using System.Web;
-@using Microsoft.Extensions.Configuration;
 @using TweetsOnThisDay.Models;
-@inject IConfiguration Configuration;
 
 <div class="tweet shadow">
 	<p class="tweet-time">@TweetContent.CreatedAt.ToString("t")</p>
@@ -26,17 +24,10 @@
 			}
 		</div>
 	}
-	<a class="tweet-link" href="@($"https://twitter.com/{_username}/status/{TweetContent.Id}")">View Tweet</a>
+	<a class="tweet-link" href="@($"https://twitter.com/_/status/{TweetContent.Id}")">View Tweet</a>
 </div>
 
 @code {
-	private string _username;
-
 	[Parameter]
 	public TweetModel TweetContent { get; set; }
-
-	protected override void OnInitialized()
-	{
-		_username = Configuration["TwitterUsername"];
-	}
 }
