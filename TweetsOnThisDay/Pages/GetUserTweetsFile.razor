@@ -52,7 +52,7 @@ else
 								.Select(x => x.Tweet)
 								.OrderBy(x => x.CreatedAt)
 								.GroupBy(x => new { x.CreatedAt.Day, x.CreatedAt.Month })
-								.ToDictionary(x => $"{x.Key.Day}/{x.Key.Month}", x => x.ToList());
+								.ToDictionary(x => int.Parse($"{x.Key.Day}{x.Key.Month:D2}"), x => x.ToList());
 
 				await File.WriteAllTextAsync(Constants.TweetsByYearFile, JsonSerializer.Serialize(tweets));
 			});

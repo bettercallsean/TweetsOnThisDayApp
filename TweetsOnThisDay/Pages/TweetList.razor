@@ -26,25 +26,25 @@ else
 	}
 	else
 	{
-	var backgroundColours = GetBackgroundColoursList();
+		var backgroundColours = GetBackgroundColoursList();
 
-	foreach (var (year, tweets) in _tweets)
-	{
-		var tweetCount = tweets.Count;
-		var backgroundColourIndex = Random.Shared.Next(backgroundColours.Count);
-		
-		<div class="tweet-year">
-			<TweetYear Tweets=@tweets Year=@year BackgroundColour=@backgroundColours[backgroundColourIndex] />
-		</div>
-		
+		foreach (var (year, tweets) in _tweets)
+		{
+			var tweetCount = tweets.Count;
+			var backgroundColourIndex = Random.Shared.Next(backgroundColours.Count);
 
-		if (backgroundColours.Count > 0)
-			backgroundColours.RemoveAt(backgroundColourIndex);
-		
+			<div class="tweet-year">
+				<TweetYear Tweets=@tweets Year=@year BackgroundColour=@backgroundColours[backgroundColourIndex] />
+			</div>
+
+
+			if (backgroundColours.Count > 0)
+				backgroundColours.RemoveAt(backgroundColourIndex);
+
 			if (backgroundColours.Count == 0)
-			backgroundColours = GetBackgroundColoursList();
+				backgroundColours = GetBackgroundColoursList();
+		}
 	}
-}
 }
 
 @code {
@@ -66,11 +66,19 @@ else
 
 			await Task.Run(async () =>
 			{
-				var tweets = JsonSerializer.Deserialize<Dictionary<string, List<TweetModel>>>(await File.ReadAllTextAsync(Constants.TweetsByYearFile));
+				var tweets = JsonSerializer.Deserialize<Dictionary<int, List<TweetModel>>>(await File.ReadAllTextAsync(Constants.TweetsByYearFile));
 
-				_tweets = tweets.FirstOrDefault(x => x.Key == $"{DateTime.Today.Day}/{DateTime.Today.Month}")
-				.Value.GroupBy(x => x.CreatedAt.Year)
-				.ToDictionary(x => x.Key, x => x.ToList());
+				var tweetsOnThisDay = tweets.Where(x => x.Key == int.Parse($"{DateTime.Today.Day}{DateTime.Today.Month:D2}")).Select(x => x.Value).FirstOrDefault();
+
+				if(tweetsOnThisDay == null)
+				{
+					_tweets = new Dictionary<int, List<TweetModel>>();
+				}
+				else
+				{
+					_tweets = tweetsOnThisDay.GroupBy(x => x.CreatedAt.Year).ToDictionary(x => x.Key, x => x.ToList());
+				}
+			
 			});
 		}
 		else
@@ -86,7 +94,6 @@ else
 				"mediumspringgreen",
 				"peachpuff",
 				"palegreen",
-				"lightcyan",
 				"thistle",
 				"powderblue"
 			};
