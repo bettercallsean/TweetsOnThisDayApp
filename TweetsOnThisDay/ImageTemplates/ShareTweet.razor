@@ -110,10 +110,10 @@
 	[Parameter]
 	public TweetModel TweetContent { get; set; }
 
-	public int TweetAge => DateTime.Today.Year - TweetContent.CreatedAt.Year;
+	private int TweetAge => DateTime.Today.Year - TweetContent.CreatedAt.Year;
 
-	private static List<string> GetBackgroundColoursList() => new List<string>
-			{
+	private static List<string> GetBackgroundColoursList() => new()
+	{
 				"skyblue",
 				"lightcoral",
 				"mediumspringgreen",

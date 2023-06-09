@@ -62,7 +62,7 @@
 	[Parameter]
 	public TweetModel TweetContent { get; set; }
 
-	public bool GeneratingSharedImage { get; set; }
+	private bool GeneratingSharedImage { get; set; }
 
 	private async Task GenerateImageAsync()
 	{
