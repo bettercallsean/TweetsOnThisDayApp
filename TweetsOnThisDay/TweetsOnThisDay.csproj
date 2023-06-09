@@ -68,6 +68,6 @@
     </ItemGroup>
      
     <ItemGroup>
-      <Folder Include="BlazorTemplate\" />
+      <Folder Include="ImageTemplates\" />
     </ItemGroup>
 </Project>
