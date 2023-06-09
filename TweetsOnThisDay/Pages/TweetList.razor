@@ -34,7 +34,8 @@ else
 
 		if (backgroundColours.Count > 0)
 			backgroundColours.RemoveAt(backgroundColourIndex);
-		else
+		
+		if(backgroundColours.Count == 0)
 			backgroundColours = GetBackgroundColoursList();
 	}
 }
