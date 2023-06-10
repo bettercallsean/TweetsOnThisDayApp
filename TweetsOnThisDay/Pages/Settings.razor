@@ -1,18 +1,18 @@
 ﻿@page "/settings"
 
 <div class="p-2">
-	<button disabled=@_isDeleteTweetButtonDisabled onclick=@DeleteTweetDataAsync type="button" class="btn btn-danger">
+	<button disabled=@IsDeleteTweetButtonDisabled onclick=@DeleteTweetDataAsync type="button" class="btn btn-danger">
 		Delete Tweet Data
 	</button>
-	<p>Size on disk: @_tweetDataFileSize MB</p>
+	<p>Size on disk: @TweetDataFileSize MB</p>
 
 	<p class="text-center font-italic">Sean Edwards 2023</p>
 </div>
 
 @code {
-	private bool _tweetFileExists => File.Exists(Constants.TweetsByYearFile);
-	private bool _isDeleteTweetButtonDisabled => !_tweetFileExists;
-	private double _tweetDataFileSize => _tweetFileExists
+	private bool TweetFileExists => File.Exists(Constants.TweetsByYearFile);
+	private bool IsDeleteTweetButtonDisabled => !TweetFileExists;
+	private double TweetDataFileSize => TweetFileExists
 		? Math.Round(new System.IO.FileInfo(Constants.TweetsByYearFile).Length / Math.Pow(2, 20), 2)
 		: 0;
 
@@ -21,6 +21,10 @@
 		var deleteData = await Application.Current.MainPage.DisplayAlert("Delete?", "Are you sure want to delete your tweet data?", "Yes", "No");
 
 		if(deleteData)
+		{
 			File.Delete(Constants.TweetsByYearFile);
+			File.Delete(Constants.ProfilePictureFile);
+		}
+		
 	}
 }
