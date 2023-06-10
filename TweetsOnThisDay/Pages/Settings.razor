@@ -13,7 +13,7 @@
 	private bool TweetFileExists => File.Exists(Constants.TweetsByYearFile);
 	private bool IsDeleteTweetButtonDisabled => !TweetFileExists;
 	private double TweetDataFileSize => TweetFileExists
-		? Math.Round(new System.IO.FileInfo(Constants.TweetsByYearFile).Length / Math.Pow(2, 20), 2)
+		? Math.Round(Directory.GetFiles(FileSystem.Current.AppDataDirectory).Sum(x => new System.IO.FileInfo(Path.Combine(FileSystem.Current.AppDataDirectory, x)).Length) / Math.Pow(2, 20), 2)
 		: 0;
 
 	private async Task DeleteTweetDataAsync()
