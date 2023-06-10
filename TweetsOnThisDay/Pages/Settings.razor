@@ -1,10 +1,10 @@
 ﻿@page "/settings"
-
+@inject NavigationManager Navigation
 
 <div class="p-2">
 	<div class="d-flex flex-column align-items-center justify-content-center">
 	<img class="rounded-circle img-thumbnail profile-picture" src="data:image/bmp;base64, @(Convert.ToBase64String(ProfilePicture))" />
-		<p class="font-weight-light">@Username</p>
+		<h4 class="font-weight-light pt-2">@Username</h4>
 	</div>
 
 	<div class="d-flex flex-column align-items-center justify-content-center pt-4">
@@ -39,7 +39,8 @@
 		{
 			File.Delete(Constants.TweetsByYearFile);
 			File.Delete(Constants.ProfilePictureFile);
+
+			Navigation.NavigateTo("/");
 		}
-		
 	}
 }
