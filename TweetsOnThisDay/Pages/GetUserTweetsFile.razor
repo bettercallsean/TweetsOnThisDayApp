@@ -49,8 +49,21 @@ else
 		await File.WriteAllBytesAsync(Constants.ProfilePictureFile, profilePicture.FileBytes);
 
 		await ProcessUserTweetsAsync(entries.Where(x => x.Name == "data/tweets.js").Select(x => Encoding.UTF8.GetString(x.FileBytes)).FirstOrDefault());
+		ProcessUserAccountData(entries.Where(x => x.Name == "data/account.js").Select(x => Encoding.UTF8.GetString(x.FileBytes)).FirstOrDefault());
 
 		IsLoading = false;
+	}
+
+	private void ProcessUserAccountData(string accountJson)
+	{
+		var accountJsonTmp = accountJson.Split("\n");
+		accountJsonTmp[0] = string.Empty;
+		accountJsonTmp[^1] = string.Empty;
+		accountJson = string.Join("", accountJsonTmp);
+
+		var accountRoot = JsonSerializer.Deserialize<AccountRoot>(accountJson);
+
+		Preferences.Set("username", accountRoot.Account.Username);
 	}
 
 	private async Task ProcessUserTweetsAsync(string tweetJson)

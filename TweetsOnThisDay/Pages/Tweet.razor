@@ -70,6 +70,8 @@
 
 		var html = new ComponentRenderer<ShareTweet>()
 			.Set(c => c.TweetContent, TweetContent)
+			.Set(c => c.ProfilePicture, await File.ReadAllBytesAsync(Constants.ProfilePictureFile))
+			.Set(c => c.Username, Preferences.Get("username", string.Empty))
 			.Render();
 
 		var file = Path.Combine(FileSystem.CacheDirectory, $"tweet {TweetContent.CreatedAt:dd-MM-yyyy}.png");
