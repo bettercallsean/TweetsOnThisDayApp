@@ -1,5 +1,8 @@
 ﻿@page "/settings"
 
+
+<img class="rounded-circle img-thumbnail" src="data:image/bmp;base64, @(Convert.ToBase64String(ProfilePicture))" />
+<p>@Username</p>
 <div class="p-2">
 	<button disabled=@IsDeleteTweetButtonDisabled onclick=@DeleteTweetDataAsync type="button" class="btn btn-danger">
 		Delete Tweet Data
@@ -15,6 +18,14 @@
 	private double TweetDataFileSize => TweetFileExists
 		? Math.Round(Directory.GetFiles(FileSystem.Current.AppDataDirectory).Sum(x => new System.IO.FileInfo(Path.Combine(FileSystem.Current.AppDataDirectory, x)).Length) / Math.Pow(2, 20), 2)
 		: 0;
+	private byte[] ProfilePicture { get; set; } = new byte[2];
+	private string Username { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		ProfilePicture = await File.ReadAllBytesAsync(Constants.ProfilePictureFile);
+		Username = Preferences.Get("username", string.Empty);
+	}
 
 	private async Task DeleteTweetDataAsync()
 	{
