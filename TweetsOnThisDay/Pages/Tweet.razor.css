@@ -4,12 +4,12 @@ html body {
 
 .tweet-time {
     text-align: center;
-    font-size: 14px;
+    font-size: small;
 }
 
 .tweet-text {
     text-align: center;
-    font-size: 18px;
+    font-size: large;
 
 }
 
