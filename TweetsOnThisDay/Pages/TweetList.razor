@@ -4,6 +4,7 @@
 @using System.Text.RegularExpressions;
 @using System.Text.Json;
 @using System.Web;
+@using TweetsOnThisDay.Helpers;
 @using TweetsOnThisDay.Models;
 
 @if (!_tweetsLoaded)
@@ -26,11 +27,14 @@ else
 	}
 	else
 	{
-		var backgroundColours = GetBackgroundColoursList();
+		var backgroundColours = new List<string>();
 
 		foreach (var (year, tweets) in _tweets)
 		{
-			var tweetCount = tweets.Count;
+			if (backgroundColours.Count == 0)
+				backgroundColours = BackgroundColourHelper.GetBackgroundColoursList();
+			
+				var tweetCount = tweets.Count;
 			var backgroundColourIndex = Random.Shared.Next(backgroundColours.Count);
 
 			<div class="tweet-year">
@@ -40,9 +44,6 @@ else
 
 			if (backgroundColours.Count > 0)
 				backgroundColours.RemoveAt(backgroundColourIndex);
-
-			if (backgroundColours.Count == 0)
-				backgroundColours = GetBackgroundColoursList();
 		}
 	}
 }
@@ -86,14 +87,4 @@ else
 			_tweetsJsonExists = false;
 		}
 	}
-
-	private static List<string> GetBackgroundColoursList() => new List<string>
-			{
-				"skyblue",
-				"lightcoral",
-				"mediumspringgreen",
-				"lightsalmon",
-				"palegreen",
-				"thistle"
-			};
 }

@@ -1,5 +1,6 @@
 @using System.Web;
 @using System.Text;
+@using TweetsOnThisDay.Helpers;
 @using TweetsOnThisDay.Models;
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -13,7 +14,7 @@
 
 	.tweet-time {
 		text-align: center;
-		font-size: 14px;
+		font-size: medium;
 	}
 
 	.tweet-text {
@@ -51,9 +52,7 @@
 
 	.tweet-year {
 		font-family: 'Roboto';
-		padding: 10px 0 10px 0;
-		position: sticky;
-		top: 0px;
+		padding: 15px 0 10px 0;
 	}
 
 	* {
@@ -67,7 +66,7 @@
 
 
 @{
-	var backgroundColours = GetBackgroundColoursList();
+	var backgroundColours = BackgroundColourHelper.GetBackgroundColoursList();
 	var backgroundColour = backgroundColours[Random.Shared.Next(backgroundColours.Count)];
 	
 	<div class="d-flex flex-column">
@@ -108,15 +107,4 @@
 	public TweetModel TweetContent { get; set; }
 
 	private int TweetAge => DateTime.Today.Year - TweetContent.CreatedAt.Year;
-
-	private static List<string> GetBackgroundColoursList() => new()
-	{
-				"skyblue",
-				"lightcoral",
-				"mediumspringgreen",
-				"peachpuff",
-				"palegreen",
-				"thistle",
-				"powderblue"
-			};
 }
