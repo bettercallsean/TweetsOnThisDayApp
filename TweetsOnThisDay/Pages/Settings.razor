@@ -3,7 +3,7 @@
 
 <div class="p-2">
 	<div class="d-flex flex-column align-items-center justify-content-center">
-	<img class="rounded-circle img-thumbnail profile-picture" src="data:image/bmp;base64, @(Convert.ToBase64String(ProfilePicture))" />
+	<img class="rounded-circle img-thumbnail profile-picture" onclick=@UploadNewPictureAsync src="data:image/bmp;base64, @(Convert.ToBase64String(ProfilePicture))" />
 		<h4 class="font-weight-light pt-2">@Username</h4>
 	</div>
 
@@ -17,30 +17,45 @@
 
 
 @code {
-	private bool TweetFileExists => File.Exists(Constants.TweetsByYearFile);
-	private bool IsDeleteTweetButtonDisabled => !TweetFileExists;
-	private double TweetDataFileSize => TweetFileExists
-		? Math.Round(Directory.GetFiles(FileSystem.Current.AppDataDirectory).Sum(x => new System.IO.FileInfo(Path.Combine(FileSystem.Current.AppDataDirectory, x)).Length) / Math.Pow(2, 20), 2)
-		: 0;
-	private byte[] ProfilePicture { get; set; } = new byte[2];
-	private string Username { get; set; }
+    private bool TweetFileExists => File.Exists(Constants.TweetsByYearFile);
+    private bool IsDeleteTweetButtonDisabled => !TweetFileExists;
+    private double TweetDataFileSize => TweetFileExists
+        ? Math.Round(Directory.GetFiles(FileSystem.Current.AppDataDirectory).Sum(x => new System.IO.FileInfo(Path.Combine(FileSystem.Current.AppDataDirectory, x)).Length) / Math.Pow(2, 20), 2)
+        : 0;
+    private byte[] ProfilePicture { get; set; } = new byte[2];
+    private string Username { get; set; }
 
-	protected override async Task OnInitializedAsync()
-	{
-		ProfilePicture = await File.ReadAllBytesAsync(Constants.ProfilePictureFile);
-		Username = Preferences.Get("username", string.Empty);
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        ProfilePicture = await File.ReadAllBytesAsync(Constants.ProfilePictureFile);
+        Username = Preferences.Get("username", string.Empty);
+    }
 
-	private async Task DeleteTweetDataAsync()
-	{
-		var deleteData = await Application.Current.MainPage.DisplayAlert("Delete?", "Are you sure want to delete your tweet data?", "Yes", "No");
+    private async Task UploadNewPictureAsync()
+    {
+        var photo = await MediaPicker.Default.PickPhotoAsync();
 
-		if(deleteData)
-		{
-			File.Delete(Constants.TweetsByYearFile);
-			File.Delete(Constants.ProfilePictureFile);
+        if (photo != null)
+        {
+            using var sourceStream = await photo.OpenReadAsync();
+            using var localFileStream = File.OpenWrite(Constants.ProfilePictureFile);
 
-			Navigation.NavigateTo("/");
-		}
-	}
+            await sourceStream.CopyToAsync(localFileStream);
+        }
+    }
+
+    private async Task DeleteTweetDataAsync()
+    {
+        var deleteData = await Application.Current.MainPage.DisplayAlert("Delete?", "Are you sure want to delete your tweet data?", "Yes", "No");
+
+        if(deleteData)
+        {
+            File.Delete(Constants.TweetsByYearFile);
+            File.Delete(Constants.ProfilePictureFile);
+            Preferences.Remove("username");
+
+
+            Navigation.NavigateTo("/");
+        }
+    }
 }
