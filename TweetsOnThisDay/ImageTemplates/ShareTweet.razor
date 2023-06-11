@@ -78,8 +78,8 @@
 	var backgroundColour = backgroundColours[Random.Shared.Next(backgroundColours.Count)];
 
 	<div class="d-flex flex-column card" style="border-color: @backgroundColour">
-		<div class="tweet-year text-white text-uppercase font-weight-bold" style="background-color: @backgroundColour">
-			<h3 class="text-center text-white">@TweetAge year@(TweetAge > 1 ? "s" : string.Empty) ago</h3>
+		<div class="tweet-year" style="background-color: @backgroundColour">
+			<h3 class="text-center text-white font-weight-bold text-uppercase">@TweetAge year@(TweetAge > 1 ? "s" : string.Empty) ago</h3>
 		</div>
         <div class="tweet shadow align-self-stretch">
         	<p class="tweet-time">@TweetContent.CreatedAt.ToString("t")</p>
