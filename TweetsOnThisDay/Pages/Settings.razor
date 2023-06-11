@@ -3,8 +3,11 @@
 
 <div class="p-2">
 	<div class="d-flex flex-column align-items-center justify-content-center">
-	<img class="rounded-circle img-thumbnail profile-picture" onclick=@UploadNewPictureAsync src="data:image/bmp;base64, @(Convert.ToBase64String(ProfilePicture))" />
-		<h4 class="font-weight-light pt-2">@Username</h4>
+        <img class="rounded-circle img-thumbnail profile-picture" onclick=@UploadNewPictureAsync src="data:image/bmp;base64, @(Convert.ToBase64String(ProfilePicture))" style="cursor: pointer" />
+        <InputText class="mt-2" @bind-Value=@Username DisplayName="Username" />
+        <button onclick=@SaveChangesAsync type="button" class="btn btn-primary mt-2">
+            Save Changes
+        </button>
 	</div>
 
 	<div class="d-flex flex-column align-items-center justify-content-center pt-4">
@@ -17,6 +20,8 @@
 
 
 @code {
+    private readonly string _temporaryProfilePicture = Path.Combine(FileSystem.Current.AppDataDirectory, "profilePictureTmp.jpg");
+
     private bool TweetFileExists => File.Exists(Constants.TweetsByYearFile);
     private bool IsDeleteTweetButtonDisabled => !TweetFileExists;
     private double TweetDataFileSize => TweetFileExists
@@ -38,10 +43,22 @@
         if (photo != null)
         {
             using var sourceStream = await photo.OpenReadAsync();
-            using var localFileStream = File.OpenWrite(Constants.ProfilePictureFile);
+            using var localFileStream = File.OpenWrite(_temporaryProfilePicture);
 
             await sourceStream.CopyToAsync(localFileStream);
         }
+
+        ProfilePicture = await File.ReadAllBytesAsync(_temporaryProfilePicture);
+    }
+
+    private async Task SaveChangesAsync()
+    {
+        using var temporaryImage = File.OpenRead(_temporaryProfilePicture);
+        using var profilePicture = File.OpenWrite(Constants.ProfilePictureFile);
+
+        await temporaryImage.CopyToAsync(profilePicture);
+
+        Preferences.Set("username", Username);
     }
 
     private async Task DeleteTweetDataAsync()
@@ -53,7 +70,6 @@
             File.Delete(Constants.TweetsByYearFile);
             File.Delete(Constants.ProfilePictureFile);
             Preferences.Remove("username");
-
 
             Navigation.NavigateTo("/");
         }
