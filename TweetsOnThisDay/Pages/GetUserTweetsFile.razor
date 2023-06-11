@@ -15,84 +15,87 @@ else
 	<div class="container p-2">
 		<p class="text-center">Get started by uploading your 'tweet.js' file here</p>
 		<div class="d-flex flex-column align-items-center justify-content-center">
-			<InputFile class="ms-8" OnChange=@OnInputFileChanged />
-				<button disabled=@(!FileUploaded) class="btn btn-primary m-2" onclick=@ProcessUserDataAsync>Upload</button>
+            <button class="btn btn-secondary" onclick=@GetUserTwitterZipArchiveAsync>Choose File</button>
+            <p>@SelectedFile.FileName</p>
+			<button disabled=@(!FileUploaded) class="btn btn-primary m-2" onclick=@ProcessUserDataAsync>Upload</button>
 		</div>
 	</div>	
 }
 
 @code {
-	private const string TwitterArchiveFolderRegex = @"twitter-([0-9]{4}-[0-9]{2}-[0-9]{2})-[a-z0-9]*";
+    private const string TwitterArchiveFolderRegex = @"twitter-([0-9]{4}-[0-9]{2}-[0-9]{2})-[a-z0-9]*";
 
-	private InputFileChangeEventArgs _inputFileChangeEventArgs;
+    private bool IsLoading { get; set; }
+    private bool FileUploaded { get; set; }
+    private FileResult SelectedFile { get; set; }
 
-	private bool IsLoading { get; set; }
-	private bool FileUploaded { get; set; }
+    [Parameter]
+    public EventCallback TweetJsFileUploaded { get; set; }
 
-	[Parameter] 
-	public EventCallback TweetJsFileUploaded { get; set; }
+    private async Task GetUserTwitterZipArchiveAsync()
+    {
+        var file = await FilePicker.Default.PickAsync(new PickOptions
+        {
+            PickerTitle = "Select archive folder"
+        });
 
-	private void OnInputFileChanged(InputFileChangeEventArgs e)
-	{
-		_inputFileChangeEventArgs = e;
-		FileUploaded = true;
-	}
+        SelectedFile = file;
+        FileUploaded = true;
+    }
 
-	private async Task ProcessUserDataAsync()
-	{
-		IsLoading = true;
+    private async Task ProcessUserDataAsync()
+    {
+        IsLoading = true;
 
-		await using var stream = _inputFileChangeEventArgs.File.OpenReadStream(long.MaxValue);
+        var entries = await ZipService.ExtractFiles(SelectedFile.FullPath);
 
-		var entries = await ZipService.ExtractFiles(stream);
+        var profilePicture = entries.FirstOrDefault(x => x.IsImage && ImageHelper.IsPictureSquare(x.FileBytes));
+        await File.WriteAllBytesAsync(Constants.ProfilePictureFile, profilePicture.FileBytes);
 
-		var profilePicture = entries.Where(x => x.IsImage && ImageHelper.IsPictureSquare(x.FileBytes)).FirstOrDefault();
-		await File.WriteAllBytesAsync(Constants.ProfilePictureFile, profilePicture.FileBytes);
+        await ProcessUserTweetsAsync(entries.Where(x => x.Name == "data/tweets.js").Select(x => Encoding.UTF8.GetString(x.FileBytes)).FirstOrDefault());
+        ProcessUserAccountData(entries.Where(x => x.Name == "data/account.js").Select(x => Encoding.UTF8.GetString(x.FileBytes)).FirstOrDefault());
 
-		await ProcessUserTweetsAsync(entries.Where(x => x.Name == "data/tweets.js").Select(x => Encoding.UTF8.GetString(x.FileBytes)).FirstOrDefault());
-		ProcessUserAccountData(entries.Where(x => x.Name == "data/account.js").Select(x => Encoding.UTF8.GetString(x.FileBytes)).FirstOrDefault());
+        IsLoading = false;
+    }
 
-		IsLoading = false;
-	}
+    private void ProcessUserAccountData(string accountJson)
+    {
+        var accountJsonTmp = accountJson.Split("\n");
+        accountJsonTmp[0] = string.Empty;
+        accountJsonTmp[^1] = string.Empty;
+        accountJson = string.Join("", accountJsonTmp);
 
-	private void ProcessUserAccountData(string accountJson)
-	{
-		var accountJsonTmp = accountJson.Split("\n");
-		accountJsonTmp[0] = string.Empty;
-		accountJsonTmp[^1] = string.Empty;
-		accountJson = string.Join("", accountJsonTmp);
+        var accountRoot = JsonSerializer.Deserialize<AccountRoot>(accountJson);
 
-		var accountRoot = JsonSerializer.Deserialize<AccountRoot>(accountJson);
+        Preferences.Set("username", accountRoot.Account.Username);
+    }
 
-		Preferences.Set("username", accountRoot.Account.Username);
-	}
+    private async Task ProcessUserTweetsAsync(string tweetJson)
+    {
+        var tweetJsonTmp = tweetJson.Split("\n");
+        tweetJsonTmp[0] = "[";
+        tweetJson = string.Join("", tweetJsonTmp);
 
-	private async Task ProcessUserTweetsAsync(string tweetJson)
-	{
-		var tweetJsonTmp = tweetJson.Split("\n");
-		tweetJsonTmp[0] = "[";
-		tweetJson = string.Join("", tweetJsonTmp);
+        try
+        {
+            await Task.Run(async () =>
+            {
+                var tweetData = JsonSerializer.Deserialize<List<Root>>(tweetJson);
 
-		try
-		{
-			await Task.Run(async () =>
-			{
-				var tweetData = JsonSerializer.Deserialize<List<Root>>(tweetJson);
+                var tweets = tweetData
+                                .Select(x => x.Tweet)
+                                .OrderBy(x => x.CreatedAt)
+                                .GroupBy(x => new { x.CreatedAt.Day, x.CreatedAt.Month })
+                                .ToDictionary(x => int.Parse($"{x.Key.Day}{x.Key.Month:D2}"), x => x.ToList());
 
-				var tweets = tweetData
-								.Select(x => x.Tweet)
-								.OrderBy(x => x.CreatedAt)
-								.GroupBy(x => new { x.CreatedAt.Day, x.CreatedAt.Month })
-								.ToDictionary(x => int.Parse($"{x.Key.Day}{x.Key.Month:D2}"), x => x.ToList());
+                await File.WriteAllTextAsync(Constants.TweetsByYearFile, JsonSerializer.Serialize(tweets));
+            });
 
-				await File.WriteAllTextAsync(Constants.TweetsByYearFile, JsonSerializer.Serialize(tweets));
-			});
-
-			await TweetJsFileUploaded.InvokeAsync();
-		}
-		catch
-		{
-			FileUploaded = false;
-		}
-	}
+            await TweetJsFileUploaded.InvokeAsync();
+        }
+        catch
+        {
+            FileUploaded = false;
+        }
+    }
 }

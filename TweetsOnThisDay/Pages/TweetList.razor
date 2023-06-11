@@ -49,42 +49,42 @@ else
 }
 
 @code {
-	private bool _tweetsLoaded => _tweets != null;
-	private Dictionary<int, List<TweetModel>> _tweets;
-	private bool _tweetsJsonExists;
+    private bool _tweetsLoaded => _tweets != null;
+    private Dictionary<int, List<TweetModel>> _tweets;
+    private bool _tweetsJsonExists;
 
-	protected override async Task OnInitializedAsync()
-	{
-		await LoadTweetsAsync();
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTweetsAsync();
+    }
 
-	private async Task LoadTweetsAsync()
-	{
-		if (File.Exists(Constants.TweetsByYearFile))
-		{
-			var foo = FileSystem.Current.AppDataDirectory;
-			_tweetsJsonExists = true;
+    private async Task LoadTweetsAsync()
+    {
+        if (File.Exists(Constants.TweetsByYearFile))
+        {
+            var foo = FileSystem.Current.AppDataDirectory;
+            _tweetsJsonExists = true;
 
-			await Task.Run(async () =>
-			{
-				var tweets = JsonSerializer.Deserialize<Dictionary<int, List<TweetModel>>>(await File.ReadAllTextAsync(Constants.TweetsByYearFile));
+            await Task.Run(async () =>
+            {
+                var tweets = JsonSerializer.Deserialize<Dictionary<int, List<TweetModel>>>(await File.ReadAllTextAsync(Constants.TweetsByYearFile));
 
-				var tweetsOnThisDay = tweets.Where(x => x.Key == int.Parse($"{DateTime.Today.Day}{DateTime.Today.Month:D2}")).Select(x => x.Value).FirstOrDefault();
+                var tweetsOnThisDay = tweets.Where(x => x.Key == int.Parse($"{DateTime.Today.Day}{DateTime.Today.Month:D2}")).Select(x => x.Value).FirstOrDefault();
 
-				if(tweetsOnThisDay == null)
-				{
-					_tweets = new Dictionary<int, List<TweetModel>>();
-				}
-				else
-				{
-					_tweets = tweetsOnThisDay.GroupBy(x => x.CreatedAt.Year).ToDictionary(x => x.Key, x => x.ToList());
-				}
-			
-			});
-		}
-		else
-		{
-			_tweetsJsonExists = false;
-		}
-	}
+                if (tweetsOnThisDay == null)
+                {
+                    _tweets = new Dictionary<int, List<TweetModel>>();
+                }
+                else
+                {
+                    _tweets = tweetsOnThisDay.GroupBy(x => x.CreatedAt.Year).ToDictionary(x => x.Key, x => x.ToList());
+                }
+
+            });
+        }
+        else
+        {
+            _tweetsJsonExists = false;
+        }
+    }
 }

@@ -1,27 +1,34 @@
 ﻿using System.IO.Compression;
+using Microsoft.AspNetCore.Components.Forms;
 using TweetsOnThisDay.Extensions;
 using TweetsOnThisDay.Models;
+using System;
+using ICSharpCode.SharpZipLib.Zip;
+using System.IO;
+using System.IO.Pipelines;
 
 namespace TweetsOnThisDay.Services;
 internal class ZipService
 {
-	public static async Task<List<ZipEntry>> ExtractFiles(Stream fileData)
+
+    public static async Task<List<Models.ZipEntry>> ExtractFiles(string zipFilePath)
 	{
-		await using var ms = new MemoryStream();
-		await fileData.CopyToAsync(ms, 10485760);
+        var entries = new List<Models.ZipEntry>();
 
-		using var archive = new ZipArchive(ms, ZipArchiveMode.Read);
+        using var zip = Ionic.Zip.ZipFile.Read(zipFilePath);
+        
+        var foo = zip.Where(x => x.FileName is "data/tweets.js" or "data/account.js" || (x.FileName.Contains("data/profile_media") && x.FileName.EndsWith(".jpg")));
 
-		var entries = new List<ZipEntry>();
+        foreach (var file in foo)
+        {
+            using var ms = new MemoryStream();
 
-		foreach (var entry in archive.Entries.Where(x => x.FullName is "data/tweets.js" or "data/account.js" || (x.FullName.Contains("data/profile_media") && !x.Name.Equals(string.Empty))))
-		{
-			await using var fileStream = entry.Open();
-			var fileBytes = await fileStream.ReadFully();
+            await using var fileStream = file.OpenReader();
+            await fileStream.CopyToAsync(ms);
 
-			entries.Add(new ZipEntry { Name = entry.FullName, IsImage = entry.Name.EndsWith(".jpg"), FileBytes = fileBytes });
-		}
-
-		return entries;
+            entries.Add(new Models.ZipEntry { Name = file.FileName, IsImage = file.FileName.EndsWith(".jpg"), FileBytes = ms.ToArray() });
+        }
+        
+        return entries;
 	}
 }
