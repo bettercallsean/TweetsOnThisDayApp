@@ -62,8 +62,9 @@ else
     {
         if (File.Exists(Constants.TweetsByYearFile))
         {
-            var foo = FileSystem.Current.AppDataDirectory;
             _tweetsJsonExists = true;
+
+            await CheckIfArchiveHasExpiredAsync();  
 
             await Task.Run(async () =>
             {
@@ -85,6 +86,22 @@ else
         else
         {
             _tweetsJsonExists = false;
+        }
+    }
+
+    private async Task CheckIfArchiveHasExpiredAsync()
+    {
+        var archiveDate = Preferences.Get("archiveDate", DateTime.MinValue);
+        var dateDifference = DateTime.Now - archiveDate;
+        var showArchiveWarning = Preferences.Get("showArchiveWarning", true);
+
+        if (dateDifference.Days >= 358 && showArchiveWarning)
+        {
+            showArchiveWarning = await Application.Current.MainPage.DisplayAlert("Archive file expiration warning", $"The uploaded twitter archive dates to {archiveDate:d} and will not contain any tweets you have made since then." +
+            $" Request a new archive from Twitter, delete the tweet data in the settings and upload the new archive.", "Ok", "Don't show again");
+
+            if (!showArchiveWarning)
+                Preferences.Set("showArchiveWarning", false);
         }
     }
 }

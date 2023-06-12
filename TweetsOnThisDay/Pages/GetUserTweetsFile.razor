@@ -66,6 +66,9 @@ else
             var profilePicture = entries.FirstOrDefault(x => x.IsImage && ImageHelper.IsPictureSquare(x.FileBytes));
             await File.WriteAllBytesAsync(Constants.ProfilePictureFile, profilePicture.FileBytes);
 
+            var archiveDate = DateTime.Parse(Regex.Match(SelectedFile.FileName, TwitterArchiveFolderRegex).Groups[1].Value);
+            Preferences.Set("archiveDate", archiveDate);
+
             await ProcessUserTweetsAsync(entries.Where(x => x.Name == "data/tweets.js").Select(x => Encoding.UTF8.GetString(x.FileBytes)).FirstOrDefault());
             ProcessUserAccountData(entries.Where(x => x.Name == "data/account.js").Select(x => Encoding.UTF8.GetString(x.FileBytes)).FirstOrDefault());
         }

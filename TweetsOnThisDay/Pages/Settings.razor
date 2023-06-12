@@ -70,6 +70,8 @@
             File.Delete(Constants.TweetsByYearFile);
             File.Delete(Constants.ProfilePictureFile);
             Preferences.Remove("username");
+            Preferences.Remove("archiveDate");
+            Preferences.Remove("showArchiveWarning");
 
             Navigation.NavigateTo("/");
         }
