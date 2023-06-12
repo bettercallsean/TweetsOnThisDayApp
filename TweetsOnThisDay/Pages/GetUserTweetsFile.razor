@@ -47,19 +47,35 @@ else
             SelectedFile = file;
             FileUploaded = true;
         }
+        else
+        {
+            SelectedFile = null;
+            FileUploaded = false;
+            await Application.Current.MainPage.DisplayAlert("Invalid File", "The uploaded file doesn't appear to be the Twitter archive ZIP. Check the uploaded file and try again.", "Ok");
+        }
     }
 
     private async Task ProcessUserDataAsync()
     {
         IsLoading = true;
 
-        var entries = await ZipService.ExtractFiles(SelectedFile.FullPath);
+        try
+        {
+            var entries = await ZipService.ExtractFiles(SelectedFile.FullPath);
 
-        var profilePicture = entries.FirstOrDefault(x => x.IsImage && ImageHelper.IsPictureSquare(x.FileBytes));
-        await File.WriteAllBytesAsync(Constants.ProfilePictureFile, profilePicture.FileBytes);
+            var profilePicture = entries.FirstOrDefault(x => x.IsImage && ImageHelper.IsPictureSquare(x.FileBytes));
+            await File.WriteAllBytesAsync(Constants.ProfilePictureFile, profilePicture.FileBytes);
 
-        await ProcessUserTweetsAsync(entries.Where(x => x.Name == "data/tweets.js").Select(x => Encoding.UTF8.GetString(x.FileBytes)).FirstOrDefault());
-        ProcessUserAccountData(entries.Where(x => x.Name == "data/account.js").Select(x => Encoding.UTF8.GetString(x.FileBytes)).FirstOrDefault());
+            await ProcessUserTweetsAsync(entries.Where(x => x.Name == "data/tweets.js").Select(x => Encoding.UTF8.GetString(x.FileBytes)).FirstOrDefault());
+            ProcessUserAccountData(entries.Where(x => x.Name == "data/account.js").Select(x => Encoding.UTF8.GetString(x.FileBytes)).FirstOrDefault());
+        }
+        catch
+        {
+            SelectedFile = null;
+            FileUploaded = false;
+
+            await Application.Current.MainPage.DisplayAlert("Invalid Zip", "The ZIP file you uploaded is not valid, please check the uploaded file and try again.", "Ok");
+        }
 
         IsLoading = false;
     }
