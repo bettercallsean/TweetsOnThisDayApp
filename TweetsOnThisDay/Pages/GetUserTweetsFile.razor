@@ -1,14 +1,14 @@
 ﻿@using System.Text.Json;
 @using System.Text;
 @using System.Drawing;
+@using System.Text.RegularExpressions;
 @using TweetsOnThisDay.Helpers;
 @using TweetsOnThisDay.Models;
 @using TweetsOnThisDay.Services;
 
 @if (IsLoading)
 {
-	<Loading IsLoading=@IsLoading LoadingText="Processing tweet data" />
-	<h4 class="text-center">This may take a minute, apologies :(</h4>
+	<Loading IsLoading=@IsLoading LoadingText="Storing tweet locally data" />
 }
 else
 {
@@ -42,8 +42,11 @@ else
             PickerTitle = "Select archive folder"
         });
 
-        SelectedFile = file;
-        FileUploaded = true;
+        if (Regex.Match(file.FileName, TwitterArchiveFolderRegex).Success)
+        {
+            SelectedFile = file;
+            FileUploaded = true;
+        }
     }
 
     private async Task ProcessUserDataAsync()
