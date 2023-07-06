@@ -3,7 +3,7 @@
 
 <div class="p-2">
 	<div class="d-flex flex-column align-items-center justify-content-center">
-        <img class="rounded-circle img-thumbnail profile-picture" onclick=@UploadNewPictureAsync src="data:image/bmp;base64, @(Convert.ToBase64String(ProfilePicture))" style="cursor: pointer" />
+        <img class="rounded-circle img-thumbnail profile-picture" onclick=@UploadNewPictureAsync src="data:image/bmp;base64, @(Convert.ToBase64String(ProfilePicture))" style="cursor: pointer; max-width: 400px"/>
         <InputText class="mt-2" @bind-Value=@Username DisplayName="Username" />
         <button onclick=@SaveChangesAsync type="button" class="btn btn-primary mt-2">
             Save Changes
@@ -46,9 +46,10 @@
             using var localFileStream = File.OpenWrite(_temporaryProfilePicture);
 
             await sourceStream.CopyToAsync(localFileStream);
+
+            ProfilePicture = await File.ReadAllBytesAsync(_temporaryProfilePicture);
         }
 
-        ProfilePicture = await File.ReadAllBytesAsync(_temporaryProfilePicture);
     }
 
     private async Task SaveChangesAsync()
@@ -57,6 +58,10 @@
         using var profilePicture = File.OpenWrite(Constants.ProfilePictureFile);
 
         await temporaryImage.CopyToAsync(profilePicture);
+
+        await temporaryImage.DisposeAsync();
+
+        File.Delete(_temporaryProfilePicture);
 
         Preferences.Set("username", Username);
     }
@@ -67,8 +72,11 @@
 
         if(deleteData)
         {
-            File.Delete(Constants.TweetsByYearFile);
-            File.Delete(Constants.ProfilePictureFile);
+            foreach (var file in Directory.GetFiles(FileSystem.Current.AppDataDirectory))
+            {
+                File.Delete(file);
+            }
+
             Preferences.Remove("username");
             Preferences.Remove("archiveDate");
             Preferences.Remove("showArchiveWarning");
