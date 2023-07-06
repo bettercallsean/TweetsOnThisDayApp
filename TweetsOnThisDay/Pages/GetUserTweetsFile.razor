@@ -49,6 +49,8 @@ else
         {
             PickerTitle = "Select archive folder"
         });
+        
+        if (file == null) return;
 
         if (Regex.Match(file.FileName, TwitterArchiveFolderRegex).Success)
         {
