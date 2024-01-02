@@ -32,6 +32,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (!TweetFileExists)
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+
         ProfilePicture = await File.ReadAllBytesAsync(Constants.ProfilePictureFile);
         Username = Preferences.Get("username", string.Empty);
     }
@@ -49,7 +55,6 @@
 
             ProfilePicture = await File.ReadAllBytesAsync(_temporaryProfilePicture);
         }
-
     }
 
     private async Task SaveChangesAsync()
