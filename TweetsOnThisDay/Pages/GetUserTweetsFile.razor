@@ -24,9 +24,12 @@ else
 		</div>
 	</div>	
     
-    <div class="container p-2">
-        <h2>How to get your twitter archive</h2>
-        <p><a href="https://twitter.com/settings/download_your_data">Click here</a> to go to the 'Download Your Data' page</p>
+    <div class="container p-2 text-center">
+        <h2>How to get your Twitter archive</h2>
+        <p>To download your Twitter archive, <a href="https://twitter.com/settings/download_your_data">go here</a> and click on 'Request Archive'</p>
+        <p>It can take a few days for this to be processed so hang tight! You will receive an email when it is ready to download.</p>
+        <p>When it's ready, download it to your phone and come back here to upload it!</p>
+        <img src="images/request_archive.png" class="p-2" style="width: 100%"/>
     </div>
 }
 
@@ -46,6 +49,8 @@ else
         {
             PickerTitle = "Select archive folder"
         });
+        
+        if (file == null) return;
 
         if (Regex.Match(file.FileName, TwitterArchiveFolderRegex).Success)
         {
