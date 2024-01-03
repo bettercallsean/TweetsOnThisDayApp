@@ -73,7 +73,7 @@
 
     private async Task DeleteTweetDataAsync()
     {
-        var deleteData = await Application.Current.MainPage.DisplayAlert("Delete?", "Are you sure want to delete your tweet data?", "Yes", "No");
+        var deleteData = await Application.Current.MainPage.DisplayAlert("Delete?", "Are you sure want to delete tweet data from the app? Your Twitter archive ZIP file will still be on your phone.", "Yes", "No");
 
         if(deleteData)
         {
