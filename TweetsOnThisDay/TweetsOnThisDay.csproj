@@ -28,9 +28,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
     <CreatePackage>false</CreatePackage>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+  </PropertyGroup>
   <ItemGroup>
     <!-- App Icon -->
-    <MauiIcon Include="Resources\AppIcon\appicon.png" Color="#009788" ForegroundScale="0.65" />
+    <MauiIcon Include="Resources\AppIcon\appicon.png" Color="#009788"  />
     <MauiImage Include="wwwroot\images\request_archive.png" />
     <!-- Splash Screen -->
     <MauiSplashScreen Include="Resources\Splash\splash.png" Color="#009788" BaseSize="432,432" />

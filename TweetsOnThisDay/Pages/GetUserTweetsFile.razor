@@ -18,7 +18,7 @@ else
             <button class="btn btn-secondary" onclick=@GetUserTwitterZipArchiveAsync>Choose File</button>
             @if (SelectedFile != null)
             {
-                <p class="text-wrap">@SelectedFile.FileName</p>
+                <p>Twitter Archive Date: @TwitterArchiveDate</p>
             }
 			<button disabled=@(!FileUploaded) class="btn btn-primary m-2" onclick=@ProcessUserDataAsync>Upload</button>
 		</div>
@@ -39,6 +39,7 @@ else
     private bool IsLoading { get; set; }
     private bool FileUploaded { get; set; }
     private FileResult SelectedFile { get; set; }
+    private string TwitterArchiveDate { get; set; }
 
     [Parameter]
     public EventCallback TweetJsFileUploaded { get; set; }
@@ -49,18 +50,21 @@ else
         {
             PickerTitle = "Select archive folder"
         });
-        
+
         if (file == null) return;
 
-        if (Regex.Match(file.FileName, TwitterArchiveFolderRegex).Success)
+        var foo = Regex.Match(file.FileName, TwitterArchiveFolderRegex);
+        if (foo.Success)
         {
             SelectedFile = file;
             FileUploaded = true;
+            TwitterArchiveDate = foo.Groups[1].Value;
         }
         else
         {
             SelectedFile = null;
             FileUploaded = false;
+            TwitterArchiveDate = string.Empty;
             await Application.Current.MainPage.DisplayAlert("Invalid File", "The uploaded file doesn't appear to be the Twitter archive ZIP. Check the uploaded file and try again.", "Ok");
         }
     }
