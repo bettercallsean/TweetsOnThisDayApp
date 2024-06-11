@@ -64,22 +64,17 @@ else
         {
             _tweetsJsonExists = true;
 
-            await CheckIfArchiveHasExpiredAsync();  
-
+            await CheckIfArchiveHasExpiredAsync();
+            
             await Task.Run(async () =>
             {
                 var tweets = JsonSerializer.Deserialize<Dictionary<int, List<TweetModel>>>(await File.ReadAllTextAsync(Constants.TweetsByYearFile));
 
                 var tweetsOnThisDay = tweets.Where(x => x.Key == int.Parse($"{DateTime.Today.Day}{DateTime.Today.Month:D2}")).Select(x => x.Value).FirstOrDefault();
 
-                if (tweetsOnThisDay == null)
-                {
-                    _tweets = new Dictionary<int, List<TweetModel>>();
-                }
-                else
-                {
-                    _tweets = tweetsOnThisDay.GroupBy(x => x.CreatedAt.Year).ToDictionary(x => x.Key, x => x.ToList());
-                }
+                _tweets = tweetsOnThisDay == null 
+	                ? new Dictionary<int, List<TweetModel>>() 
+	                : tweetsOnThisDay.GroupBy(x => x.CreatedAt.Year).ToDictionary(x => x.Key, x => x.ToList());
 
             });
         }
@@ -89,7 +84,7 @@ else
         }
     }
 
-    private async Task CheckIfArchiveHasExpiredAsync()
+    private static async Task CheckIfArchiveHasExpiredAsync()
     {
         var archiveDate = Preferences.Get("archiveDate", DateTime.MinValue);
         var dateDifference = DateTime.Now - archiveDate;

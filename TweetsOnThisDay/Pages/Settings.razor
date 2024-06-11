@@ -25,7 +25,7 @@
     private bool TweetFileExists => File.Exists(Constants.TweetsByYearFile);
     private bool IsDeleteTweetButtonDisabled => !TweetFileExists;
     private double TweetDataFileSize => TweetFileExists
-        ? Math.Round(Directory.GetFiles(FileSystem.Current.AppDataDirectory).Sum(x => new System.IO.FileInfo(Path.Combine(FileSystem.Current.AppDataDirectory, x)).Length) / Math.Pow(2, 20), 2)
+        ? Math.Round(Directory.GetFiles(FileSystem.Current.AppDataDirectory).Sum(x => new FileInfo(Path.Combine(FileSystem.Current.AppDataDirectory, x)).Length) / Math.Pow(2, 20), 2)
         : 0;
     private byte[] ProfilePicture { get; set; } = new byte[2];
     private string Username { get; set; }
