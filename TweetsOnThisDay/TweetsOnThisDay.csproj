@@ -52,6 +52,7 @@
     <PackageReference Include="BlazorTemplater" Version="1.5.1" />
     <PackageReference Include="CommunityToolkit.Maui" Version="5.2.0" />
     <PackageReference Include="Faso.Blazor.SpinKit" Version="1.0.1" />
+    <PackageReference Include="MudBlazor" Version="6.20.0" />
     <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="DotNetZip" Version="1.16.0" />
     <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.3" />
@@ -60,6 +61,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.21" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="appsettings.json" />

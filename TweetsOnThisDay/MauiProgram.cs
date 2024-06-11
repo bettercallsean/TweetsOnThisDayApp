@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MudBlazor.Services;
 using RestSharp;
 using TweetsOnThisDay.Interfaces;
 using TweetsOnThisDay.Services;
@@ -31,6 +32,8 @@ public static class MauiProgram
 					.Build();
 
 		builder.Configuration.AddConfiguration(config);
+
+		builder.Services.AddMudServices();
 
 		builder.Services
 			.AddSingleton<IRestClient>(new RestClient(new HttpClient()))
