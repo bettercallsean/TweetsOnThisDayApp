@@ -1,29 +1,4 @@
 ﻿<MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All">Home</MudNavLink>
-    <MudNavLink Href="/Settings" Match="NavLinkMatch.All">Settings</MudNavLink>
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+    <MudNavLink Href="/Settings" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Settings">Settings</MudNavLink>
 </MudNavMenu>
-
-@code {
-    private const string Settings = "Settings";
-    private const string TweetsOnThisDay = "Tweets On This Day";
-
-    private bool CollapseNavMenu = true;
-    private string _selectedPage;
-
-    private string NavMenuCssClass => CollapseNavMenu ? "collapse" : null;
-
-    protected override void OnInitialized()
-    {
-        _selectedPage = TweetsOnThisDay;
-    }
-
-    private void ToggleNavMenu()
-    {
-        CollapseNavMenu = !CollapseNavMenu;
-    }
-
-    private void SetHeaderTitle(string pageName)
-    {
-        _selectedPage = pageName;
-    }
-}
